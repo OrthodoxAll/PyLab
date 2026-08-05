@@ -2,8 +2,7 @@
 # from shlex import split
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
+import re
 # def print_hi(name):
 #     # Use a breakpoint in the code line below to debug your script.
 #     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
@@ -34,6 +33,8 @@ from mypy.meet import typed_dict_mapping_pair
 #     list2 = [3, 4, 5, 6]
 #
 #     print(int_list(list1, list2))
+import re
+
 
 def clear_names(file_name: str) -> list:
     """
@@ -58,7 +59,30 @@ def clear_names(file_name: str) -> list:
     except Exception as e:
         print(f"Произошла ошибка: {e}")
 
+
+
+def is_cirillic(name_items: str) -> bool:
+    """
+    Проверка на введение в строку кириллицы
+    """
+    return bool(re.search('[а-яА-Я]', name_items))
+
+
+def filter_russian_names(names_list: str) -> str:
+    """
+    Фильтрация имен написанных на русском
+
+    :param file_name:
+    """
+    new_names_list = list()
+    for name_item in names_list:
+        if is_cirillic(name_item):
+            new_names_list.append(name_item)
+
+    return new_names_list
+
 if __name__ == '__main__':
     cleared_names = clear_names('names.txt')
-    for i in cleared_names:
-        print(i)
+    # for i in cleared_names:
+    #     print(i)
+    print(filter_russian_names(cleared_names))
