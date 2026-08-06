@@ -26,9 +26,9 @@ def mask_account_card(type_number_card: str) -> str:
     return f"{card_type_str} {maske}"
 
 
-str1 = "Счет 73654108430135874305"
-
-print(mask_account_card(str1))
+# str1 = "Счет 73654108430135874305"
+#
+# print(mask_account_card(str1))
 
 
 from datetime import datetime
@@ -46,9 +46,9 @@ def get_date(date_string: str) -> str:
         return "Неверный формат даты"
 
 
-str2 = "2024-03-11T02:26:18.671407"
-
-print(get_date(str2))
+# str2 = "2024-03-11T02:26:18.671407"
+#
+# print(get_date(str2))
 
 
 # def get_date_iso(date_string: str) -> str:
