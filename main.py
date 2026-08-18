@@ -18,6 +18,7 @@ import re
 
 from typing import List
 
+import math
 from mypy.meet import typed_dict_mapping_pair
 
 #
@@ -36,6 +37,18 @@ from mypy.meet import typed_dict_mapping_pair
 #
 #     print(int_list(list1, list2))
 import re
+
+
+
+
+
+from src.masks import get_mask_card_number, get_mask_account
+
+card_number = input("Введите номер карты: ")
+print(get_mask_card_number(card_number))
+
+account_number = input("Введите номер аккаунта: ")
+print(get_mask_account(account_number))
 
 
 def clear_names(file_name: str) -> list:
@@ -107,6 +120,8 @@ def safe_to_file(file_name: str, data: str) -> None:
         names_file.write(data)
 
 
+
+
 if __name__ == "__main__":
     cleared_names = clear_names("names.txt")
     # for i in cleared_names:
@@ -116,3 +131,34 @@ if __name__ == "__main__":
 
     filtered_name = filter_english_names(cleared_names)
     safe_to_file("english_names.txt", "\n".join(filtered_name))
+
+
+def divider(x, y):
+    if y >0:
+        return x/y
+    return 0
+
+
+def reverse_strring(my_string):
+    return my_string[::-1]
+
+def calculate_logarithm(x,base):
+    return math.log(x, base)
+
+def calc_avg(my_list):
+    if len(my_list) == 0:
+        return 0
+    return sum(my_list)/len(my_list)
+
+assert calc_avg([1,2,3,4]) == 2.5
+
+assert calc_avg([]) == 0
+
+
+def finder(my_list, my_type):
+    counter = 0
+    for item in my_list:
+         if isinstance(item, my_type):
+             counter += 1
+    return counter
+
