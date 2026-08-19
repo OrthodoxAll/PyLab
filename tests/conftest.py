@@ -68,3 +68,15 @@ def invalid_date():
     "14:30:00",                # только время без даты
    None)                   # отсутствие даты (None)
     ]
+
+
+
+@pytest.fixture
+def sample_data():
+    return [
+        {'id': 1, 'state': 'EXECUTED', 'date': '2024-01-01T10:00:00'},
+        {'id': 2, 'state': 'PENDING', 'date': '2024-01-02T11:00:00'},
+        {'id': 3, 'state': 'FAILED', 'date': '2024-01-03T12:00:00'},
+        {'id': 4, 'state': 'EXECUTED', 'date': '2024-01-04T13:00:00'},
+        {'id': 5, 'date': '2024-01-05T14:00:00'}  # без ключа 'state'
+    ]
