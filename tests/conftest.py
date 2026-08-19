@@ -18,3 +18,11 @@ def invalid_card_numbers():
         "7000-7922-8960-6361",  # Символы
         "12345678901234a6"  # Буква среди цифр
     ]
+
+@pytest.fixture
+def valid_mask_input_case():
+    return [("Visa Platinum 7000792289606361", "Visa Platinum 7000 79** **** 6361"),
+    ("Счет 73654108430135874305", "Счет **4305"),
+    ("MasterCard Gold 1234567890123456", "MasterCard Gold 1234 56** **** 3456"),
+    ("Счет 12345678901234567890", "Счет **7890")
+              ]
