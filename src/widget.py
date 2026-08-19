@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from masks import get_mask_account, get_mask_card_number
+from src.masks import get_mask_account, get_mask_card_number
 
 
 def mask_account_card(type_number_card: str) -> str:
@@ -21,11 +21,11 @@ def mask_account_card(type_number_card: str) -> str:
             masked_number += part
     card_type_str = " ".join(card_type)  # Соединяем слова списка в строку через пробел, на случай двойных названий
     if len(masked_number) == 16:  # проверем на соответсвие номеру карты
-        maske = get_mask_card_number(masked_number)
+        mask = get_mask_card_number(masked_number)
     else:
-        maske = get_mask_account(masked_number)
+        mask = get_mask_account(masked_number)
 
-    return f"{card_type_str} {maske}"
+    return f"{card_type_str} {mask}"
 
 
 def get_date(date_string: str) -> str:
