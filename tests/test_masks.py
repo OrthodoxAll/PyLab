@@ -52,4 +52,5 @@ def test_get_mask_account_invalid(account_number):
     with pytest.raises(ValueError):
         get_mask_account(account_number)
 
+
 ####################
