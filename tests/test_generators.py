@@ -1,6 +1,7 @@
 import pytest
 
-from src.generators import filter_by_currency
+from src.generators import filter_by_currency, transaction_descriptions
+
 
 def test_filter_by_currency(transactions):
     # Фильтруем по валюте USD
@@ -19,3 +20,20 @@ def test_filter_by_currency(transactions):
     # Проверяем, что больше транзакций не осталось
     with pytest.raises(StopIteration):
         next(usd_transactions)
+
+def test_transaction_descriptions(transactions):
+    #получаем виды операций
+    des_transactions = transaction_descriptions(transactions)
+
+    expected_des_transactions = [transactions[0]["description"],
+                                transactions[1]["description"],
+                                transactions[2]["description"],
+                                transactions[3]["description"]
+                                ]
+
+    for expected in expected_des_transactions:
+        assert next(des_transactions) == expected
+
+    # Проверяем, что больше транзакций не осталось
+    with pytest.raises(StopIteration):
+        next(des_transactions)

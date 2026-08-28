@@ -91,3 +91,28 @@ usd_transactions = filter_by_currency(transactions, "RUB")
 for _ in range(2):
     print(next(usd_transactions))
 
+
+def transaction_descriptions(transactions: list[dict[str,Any]]) -> str:
+    for transaction in transactions:
+        yield transaction["description"]
+
+description_transactions = transaction_descriptions(transactions)
+for _ in range(4):
+    print(next(description_transactions))
+
+
+def card_number_generator(start:int, end:int)->str:
+    """
+    Генератор, который выдает номера банковских карт в формате XXXX XXXX XXXX XXXX.
+    """
+    # Итерируемся по диапазону от start до end (включительно)
+    for number in range(start, end + 1):
+        # Форматируем номер карты в строку длиной 16 символов,
+        # заполняя ведущие нули до 16 цифр, если число меньше 10^16
+        formatted_number = f'{number:016d}'
+        # Создаем строку в формате XXXX XXXX XXXX XXXX
+        # Используем срезы, чтобы разделить строку на части по 4 цифры
+        yield f'{formatted_number[:4]} {formatted_number[4:8]} {formatted_number[8:12]} {formatted_number[12:]}'
+
+for card_number in card_number_generator(1, 5):
+    print(card_number)
