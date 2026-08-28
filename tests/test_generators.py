@@ -1,6 +1,6 @@
 import pytest
 
-from src.generators import filter_by_currency, transaction_descriptions
+from src.generators import filter_by_currency, transaction_descriptions, card_number_generator
 
 
 def test_filter_by_currency(transactions):
@@ -37,3 +37,42 @@ def test_transaction_descriptions(transactions):
     # Проверяем, что больше транзакций не осталось
     with pytest.raises(StopIteration):
         next(des_transactions)
+
+
+def test_card_number_generator():
+    # Проверка работы генератора для диапазона от 1 до 15
+    expected = [
+        '0000 0000 0000 0001',
+        '0000 0000 0000 0002',
+        '0000 0000 0000 0003',
+        '0000 0000 0000 0004',
+        '0000 0000 0000 0005',
+        '0000 0000 0000 0006',
+        '0000 0000 0000 0007',
+        '0000 0000 0000 0008',
+        '0000 0000 0000 0009',
+        '0000 0000 0000 0010',
+        '0000 0000 0000 0011',
+        '0000 0000 0000 0012',
+        '0000 0000 0000 0013',
+        '0000 0000 0000 0014',
+        '0000 0000 0000 0015'
+    ]
+    generated = list(card_number_generator(1, 15))
+    assert generated == expected
+
+    # Проверка работы генератора для диапазона с одним элементом (10 до 10)
+    expected = [
+        '0000 0000 0000 0010'
+    ]
+    generated = list(card_number_generator(10, 10))
+    assert generated == expected
+
+    # Проверка работы генератора для диапазона от 9999 до 10000
+    expected = [
+        '0000 0000 0000 9999',
+        '0000 0000 0001 0000'
+        ]
+
+    generated = list(card_number_generator(9999, 10000))
+    assert generated == expected

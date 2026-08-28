@@ -114,5 +114,5 @@ def card_number_generator(start:int, end:int)->str:
         # Используем срезы, чтобы разделить строку на части по 4 цифры
         yield f'{formatted_number[:4]} {formatted_number[4:8]} {formatted_number[8:12]} {formatted_number[12:]}'
 
-for card_number in card_number_generator(1, 5):
+for card_number in card_number_generator(1, 15):
     print(card_number)
