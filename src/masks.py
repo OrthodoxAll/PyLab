@@ -8,9 +8,7 @@ def get_mask_card_number(card_number: str) -> str:
     if not card_number.isdigit() or len(card_number) != 16:
         print("Проверьте ввод, Номер карты должен состоять из 16 цифр.")
         raise ValueError("Номер карты должен состоять из 16 цифр.")
-    masked_number = (
-        card_number[0:4] + " " + card_number[4:6] + "** **** " + card_number[12:]
-    )
+    masked_number = card_number[0:4] + " " + card_number[4:6] + "** **** " + card_number[12:]
     return masked_number
 
 
@@ -25,5 +23,6 @@ def get_mask_account(account_number: str) -> str:
         raise ValueError("Номер аккаунта должен состоять из 20 цифр.")
     mask_account = "**" + account_number[16:]
     return mask_account
+
 
 ###################
