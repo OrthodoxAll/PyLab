@@ -19,11 +19,11 @@ def log (filename= None):
             try:
                 result = func(*args, **kwargs)
                 end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                write_log(f"{func.__name__} ok"
+                write_log(f"{func.__name__} ok "
                           f"Время начала - {start_time}. Время окончания - {end_time} ")
                 return result
             except Exception as e:
-                end_time = time()
+                end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 write_log(f"{func.__name__} error: {str(e)}. Inputs: {args}, {kwargs} "
                           f"Время начала - {start_time}. Время окончания - {end_time}")
                 raise
@@ -31,5 +31,17 @@ def log (filename= None):
     return decorator
 
 
+@log()
+def mul(a, b):
+    return a * b
+
+mul(4, 5)
+
+
+@log()
+def sub(a, b):
+    return a / b
+with pytest.raises(ZeroDivisionError):
+    sub(4, 0)
 
 
