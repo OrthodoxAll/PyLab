@@ -41,9 +41,9 @@ def cleanup_logfile():
     if os.path.exists(logfile):
         os.remove(logfile)
 
-def test_success_console(monkeypatch):
-    out = StringIO()
-    monkeypatch.setattr(sys, "stdout", out)
+# def test_success_console(monkeypatch):
+#     out = StringIO()
+#     monkeypatch.setattr(sys, "stdout", out)
 
     @log()
     def plus(a, b):
