@@ -67,7 +67,7 @@ poetry install
 #### 9. load_transactions 
 - читает данные о транзакцияч и json файла
 - возвращает list[dict,str]
-#### 10. oad_transactions 
+#### 10. get_transaction_amount 
 - обращается к api.apilayer.com за курсом
 - переводит сумму из транзакций в рубли
 - возвращает float
