@@ -1,12 +1,11 @@
 import os
 
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
-
-import requests
 
 
 def get_transaction_amount(transaction: dict) -> float:
@@ -18,9 +17,7 @@ def get_transaction_amount(transaction: dict) -> float:
     else:
         url = f"https://api.apilayer.com/exchangerates_data/convert?to=RUB&from=" f"{currency}&amount={amount}"
         headers = {"apikey": API_KEY}
-
         response = requests.get(url, headers=headers)
-
         if response.status_code != 200:
             raise ValueError(f"Failed to get currency rate {response.text}")
         return round(response.json()["result"], 2)

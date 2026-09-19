@@ -19,4 +19,5 @@ def load_transactions(path: str) -> list[dict]:
         print("Файл не найден")
         return []
 
-print(load_transactions('../data/operations.json'))
+
+print(load_transactions("../data/operations.json"))
