@@ -145,3 +145,22 @@ def card_number():
         "0000 0000 0000 0014",
         "0000 0000 0000 0015",
     ]
+
+@pytest.fixture
+def load_transactions_rub():
+    return {
+    "id": 172864002,
+    "state": "EXECUTED",
+    "date": "2018-12-28T23:10:35.459698",
+    "operationAmount": {"amount": "49192.52", "currency": {"name": "RUB", "code": "RUB"}},
+}
+
+
+@pytest.fixture
+def load_transactions_usd():
+    return {
+    "id": 172864003,
+    "state": "EXECUTED",
+    "date": "2018-12-28T23:10:35.459698",
+    "operationAmount": {"amount": "10", "currency": {"name": "USD", "code": "USD"}},
+}
