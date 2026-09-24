@@ -1,5 +1,6 @@
 import json
 import logging
+from os import name
 
 logger = logging.getLogger('utils')
 logger.setLevel(logging.INFO)
@@ -34,3 +35,6 @@ def load_transactions(path: str) -> list[dict]:
 
 
 print(load_transactions("../data/operations.json"))
+
+
+########
