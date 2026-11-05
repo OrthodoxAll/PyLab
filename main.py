@@ -2,7 +2,25 @@
 # from shlex import split
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+import math
+
+#     tmp_list=[]
+#     for i in list1:
+#         if i in list2:
+#             tmp_list.append(i)
+#     return tmp_list
+#
+# if __name__ == '__main__':
+#     list1 = [1, 2, 3, 4]
+#     list2 = [3, 4, 5, 6]
+#
+#     print(int_list(list1, list2))
 import re
+from typing import List
+
+from mypy.meet import typed_dict_mapping_pair
+
+from src.masks import get_mask_account, get_mask_card_number
 
 # def print_hi(name):
 #     # Use a breakpoint in the code line below to debug your script.
@@ -16,33 +34,17 @@ import re
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
 
-from typing import List
 
-import math
-from mypy.meet import typed_dict_mapping_pair
 
 #
 #
 # def int_list(list1:List[int], list2:List[int]) -> List[int]:
 #     '''Функция получения пересечения списков'''
-#     tmp_list=[]
-#     for i in list1:
-#         if i in list2:
-#             tmp_list.append(i)
-#     return tmp_list
-#
-# if __name__ == '__main__':
-#     list1 = [1, 2, 3, 4]
-#     list2 = [3, 4, 5, 6]
-#
-#     print(int_list(list1, list2))
-import re
 
 
 
 
 
-from src.masks import get_mask_card_number, get_mask_account
 
 card_number = input("Введите номер карты: ")
 print(get_mask_card_number(card_number))
