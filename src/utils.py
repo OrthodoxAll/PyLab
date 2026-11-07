@@ -34,7 +34,6 @@ def load_transactions(path: str) -> list[dict]:
         return []
 
 
-print(load_transactions("../data/operations.json"))
 
 
 ########
