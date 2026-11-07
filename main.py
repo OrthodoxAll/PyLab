@@ -10,6 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = BASE_DIR / "data"
 STATUSES = ("EXECUTED", "CANCELED", "PENDING")
 
+
 def get_amount_and_currency(transaction: dict[str, Any]) -> tuple[float, str]:
     """
     Возвращает сумму и код валюты для JSON, CSV и XLSX.
@@ -36,11 +37,7 @@ def filter_rub_transactions(data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     :param data: список словарей с транзакциями
     :return: список транзакций в рублях
     """
-    return [
-        transaction
-        for transaction in data
-        if get_amount_and_currency(transaction)[1] == "RUB"
-    ]
+    return [transaction for transaction in data if get_amount_and_currency(transaction)[1] == "RUB"]
 
 
 def format_amount(amount: float, currency: str) -> str:
@@ -75,10 +72,7 @@ def print_transaction(transaction: dict[str, Any]) -> None:
     to_account = transaction.get("to")
 
     if from_account and to_account:
-        print(
-            f"{mask_account_card(str(from_account))} -> "
-            f"{mask_account_card(str(to_account))}"
-        )
+        print(f"{mask_account_card(str(from_account))} -> " f"{mask_account_card(str(to_account))}")
     elif to_account:
         print(mask_account_card(str(to_account)))
 
@@ -165,15 +159,11 @@ def main() -> None:
     transactions = filter_by_state(transactions, status)
 
     if ask_yes_no("Отсортировать операции по дате? Да/Нет\n"):
-        direction = input(
-            "Отсортировать по возрастанию или по убыванию?\n"
-        ).strip().lower()
+        direction = input("Отсортировать по возрастанию или по убыванию?\n").strip().lower()
 
         while direction not in {"по возрастанию", "по убыванию"}:
             print("Введите «по возрастанию» или «по убыванию».")
-            direction = input(
-                "Отсортировать по возрастанию или по убыванию?\n"
-            ).strip().lower()
+            direction = input("Отсортировать по возрастанию или по убыванию?\n").strip().lower()
 
         transactions = sort_by_date(
             transactions,
@@ -183,19 +173,14 @@ def main() -> None:
     if ask_yes_no("Выводить только рублевые транзакции? Да/Нет\n"):
         transactions = filter_rub_transactions(transactions)
 
-    if ask_yes_no(
-        "Отфильтровать список транзакций по определенному слову в описании? Да/Нет\n"
-    ):
+    if ask_yes_no("Отфильтровать список транзакций по определенному слову в описании? Да/Нет\n"):
         search = input("Введите слово для поиска: ").strip()
         transactions = process_bank_search(transactions, search)
 
     print("Распечатываю итоговый список транзакций...")
 
     if not transactions:
-        print(
-            "Не найдено ни одной транзакции, подходящей под ваши "
-            "условия фильтрации"
-        )
+        print("Не найдено ни одной транзакции, подходящей под ваши " "условия фильтрации")
         return
 
     print(f"Всего банковских операций в выборке: {len(transactions)}")
@@ -207,3 +192,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+    ##############

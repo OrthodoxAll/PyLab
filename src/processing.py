@@ -1,6 +1,7 @@
 import re
-from typing import Any
 from collections import Counter
+from typing import Any
+
 
 def filter_by_state(data: list[dict[str, Any]], state: str = "EXECUTED") -> list[dict[str, Any]]:
     """
@@ -32,7 +33,6 @@ def sort_by_date(data: list[dict[str, Any]], descending: bool = True) -> list[di
     return list(sorted(data_filtered, key=lambda x: x["date"], reverse=descending))  # сортировка data
 
 
-
 def process_bank_search(data: list[dict[str, Any]], search: str) -> list[dict[str, Any]]:
     """
     Ищет операции, в описании которых есть заданная строка.
@@ -45,15 +45,10 @@ def process_bank_search(data: list[dict[str, Any]], search: str) -> list[dict[st
     if not search:
         return []
     pattern = re.compile(re.escape(search), re.IGNORECASE)
-    return [
-        transaction
-        for transaction in data
-        if pattern.search(str(transaction.get("description", "")))
-    ]
+    return [transaction for transaction in data if pattern.search(str(transaction.get("description", "")))]
 
-def process_bank_operations(
-    data: list[dict[str, Any]], categories: list[str]
-) -> dict[str, int]:
+
+def process_bank_operations(data: list[dict[str, Any]], categories: list[str]) -> dict[str, int]:
     """
     Считает количество операций по категориям из поля description.
 
@@ -62,9 +57,7 @@ def process_bank_operations(
     :return: словарь {категория: количество операций}
     """
     descriptions = Counter(
-        str(transaction.get("description", ""))
-        for transaction in data
-        if transaction.get("description") in categories
+        str(transaction.get("description", "")) for transaction in data if transaction.get("description") in categories
     )
 
     return dict(descriptions)

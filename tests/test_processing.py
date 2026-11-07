@@ -1,11 +1,6 @@
 import pytest
 
-from src.processing import (
-    filter_by_state,
-    sort_by_date,
-    process_bank_operations,
-    process_bank_search
-)
+from src.processing import filter_by_state, sort_by_date, process_bank_operations, process_bank_search
 
 
 def test_filter_by_state_empty():
@@ -62,7 +57,6 @@ def test_sort_by_date_equal_dates():
     result = sort_by_date(data)
     result_ids = [item["id"] for item in result]
     assert set(result_ids) == {10, 11, 12}  # порядок любой, главное — все на месте
-
 
 
 def test_process_bank_search_is_case_insensitive():
