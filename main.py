@@ -1,166 +1,196 @@
-# This is a sample Python script.
-# from shlex import split
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-import math
+from pathlib import Path
+from typing import Any
 
-#     tmp_list=[]
-#     for i in list1:
-#         if i in list2:
-#             tmp_list.append(i)
-#     return tmp_list
-#
-# if __name__ == '__main__':
-#     list1 = [1, 2, 3, 4]
-#     list2 = [3, 4, 5, 6]
-#
-#     print(int_list(list1, list2))
-import re
-from typing import List
+from src.processing import filter_by_state, process_bank_search, sort_by_date
+from src.reader_csv_xlsx import read_transactions_csv, read_transactions_excel
+from src.utils import load_transactions
+from src.widget import get_date, mask_account_card
 
-from mypy.meet import typed_dict_mapping_pair
-
-from src.masks import get_mask_account, get_mask_card_number
-
-# def print_hi(name):
-#     # Use a breakpoint in the code line below to debug your script.
-#     print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-#
-#
-# # Press the green button in the gutter to run the script.
-# if __name__ == '__main__':
-#     print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+BASE_DIR = Path(__file__).resolve().parent
+DATA_DIR = BASE_DIR / "data"
+STATUSES = ("EXECUTED", "CANCELED", "PENDING")
 
 
-
-
-#
-#
-# def int_list(list1:List[int], list2:List[int]) -> List[int]:
-#     '''Функция получения пересечения списков'''
-
-
-
-
-
-
-card_number = input("Введите номер карты: ")
-print(get_mask_card_number(card_number))
-
-account_number = input("Введите номер аккаунта: ")
-print(get_mask_account(account_number))
-
-
-def clear_names(file_name: str) -> list:
+def get_amount_and_currency(transaction: dict[str, Any]) -> tuple[float, str]:
     """
-    Функция для очистки имен от лишних символов
-    :param file_name:
+    Возвращает сумму и код валюты для JSON, CSV и XLSX.
+
+    :param transaction: словарь с транзакцией
+    :return: сумма и код валюты
     """
-    clear_names_list = list()
-    try:
-        with open("data/" + file_name, encoding="utf-8") as name_file:
-            names_list = name_file.read().split()  # Читаем имена из файла
-            for name in names_list:
-                new_name = ""
-                for simbol in name:
-                    if simbol.isalpha():
-                        new_name += simbol
-                if new_name.isalpha():
-                    clear_names_list.append(new_name)
+    operation_amount = transaction.get("operationAmount")
 
-        return clear_names_list
-    except FileNotFoundError:
-        print("Файл не найден. Проверьте путь к файлу.")
-    except Exception as e:
-        print(f"Произошла ошибка: {e}")
+    if isinstance(operation_amount, dict):
+        amount = operation_amount.get("amount", 0)
+        currency = operation_amount.get("currency", {}).get("code", "")
+    else:
+        amount = transaction.get("amount", 0)
+        currency = transaction.get("currency_code", "")
+
+    return float(amount), str(currency)
 
 
-def is_cirillic(name_items: str) -> bool:
+def filter_rub_transactions(data: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """
-    Проверка на введение в строку кириллицы
+    Оставляет только рублёвые операции.
+
+    :param data: список словарей с транзакциями
+    :return: список транзакций в рублях
     """
-    return bool(re.search("[а-яА-Я]", name_items))
+    return [transaction for transaction in data if get_amount_and_currency(transaction)[1] == "RUB"]
 
 
-def filter_russian_names(names_list: str) -> str:
+def format_amount(amount: float, currency: str) -> str:
     """
-    Фильтрация имен написанных на русском
+    Форматирует сумму для вывода.
 
-    :param file_name:
+    :param amount: сумма операции
+    :param currency: код валюты
+    :return: строка вида «Сумма: 40542 руб.»
     """
-    new_names_list = list()
-    for name_item in names_list:
-        if is_cirillic(name_item):
-            new_names_list.append(name_item)
+    if amount.is_integer():
+        value = str(int(amount))
+    else:
+        value = f"{amount:.2f}".rstrip("0").rstrip(".")
 
-    return new_names_list
+    suffix = "руб." if currency == "RUB" else currency
+    return f"Сумма: {value} {suffix}"
 
 
-def filter_english_names(names_list: str) -> str:
+def print_transaction(transaction: dict[str, Any]) -> None:
     """
-    Фильтрация имен написанных на английском
+    Печатает одну банковскую операцию.
 
-    :param file_name:
+    :param transaction: словарь с транзакцией
     """
-    new_names_list = list()
-    for name_item in names_list:
-        if not is_cirillic(name_item):
-            new_names_list.append(name_item)
+    date = get_date(str(transaction.get("date", "")))
+    description = transaction.get("description", "")
 
-    return new_names_list
+    print(f"{date} {description}")
+
+    from_account = transaction.get("from")
+    to_account = transaction.get("to")
+
+    if from_account and to_account:
+        print(f"{mask_account_card(str(from_account))} -> " f"{mask_account_card(str(to_account))}")
+    elif to_account:
+        print(mask_account_card(str(to_account)))
+
+    amount, currency = get_amount_and_currency(transaction)
+    print(format_amount(amount, currency))
+    print()
 
 
-def safe_to_file(file_name: str, data: str) -> None:
+def load_data(choice: str) -> tuple[list[dict[str, Any]], str]:
     """
-    Save values in file
-    :param file_name:
-    :param data:
+    Загружает транзакции из выбранного источника.
+
+    :param choice: пункт меню: 1 — JSON, 2 — CSV, 3 — XLSX
+    :return: список транзакций и название формата
     """
-    with open("data/" + file_name, "w", encoding="utf-8") as names_file:
-        names_file.write(data)
+    if choice == "1":
+        return load_transactions(str(DATA_DIR / "operations.json")), "JSON"
+
+    if choice == "2":
+        return read_transactions_csv(str(DATA_DIR / "transactions.csv")), "CSV"
+
+    return read_transactions_excel(str(DATA_DIR / "transactions_excel.xlsx")), "XLSX"
 
 
+def ask_yes_no(question: str) -> bool:
+    """
+    Задаёт вопрос с ответом «Да» или «Нет».
+
+    :param question: текст вопроса
+    :return: True для «Да», False для «Нет»
+    """
+    while True:
+        answer = input(question).strip().lower()
+
+        if answer in {"да", "yes", "y", "д"}:
+            return True
+
+        if answer in {"нет", "no", "n", "н"}:
+            return False
+
+        print("Пожалуйста, введите «Да» или «Нет».")
+
+
+def choose_status() -> str:
+    """
+    Запрашивает корректный статус операции.
+
+    :return: статус в верхнем регистре
+    """
+    print("Введите статус, по которому необходимо выполнить фильтрацию.")
+    print("Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING")
+
+    while True:
+        user_input = input().strip()
+        status = user_input.upper()
+
+        if status in STATUSES:
+            print(f'Операции отфильтрованы по статусу "{status}"')
+            return status
+
+        print(f'Статус операции "{user_input}" недоступен.')
+        print("Введите статус, по которому необходимо выполнить фильтрацию.")
+        print("Доступные для фильтровки статусы: EXECUTED, CANCELED, PENDING")
+
+
+def main() -> None:
+    """Основная логика работы программы с пользователем."""
+    print("Привет! Добро пожаловать в программу работы с банковскими транзакциями.")
+    print("Выберите необходимый пункт меню:")
+    print("1. Получить информацию о транзакциях из JSON-файла")
+    print("2. Получить информацию о транзакциях из CSV-файла")
+    print("3. Получить информацию о транзакциях из XLSX-файла")
+
+    while True:
+        choice = input().strip()
+        if choice in {"1", "2", "3"}:
+            break
+        print("Введите 1, 2 или 3.")
+
+    transactions, source = load_data(choice)
+    print(f"Для обработки выбран {source}-файл.")
+
+    status = choose_status()
+    transactions = filter_by_state(transactions, status)
+
+    if ask_yes_no("Отсортировать операции по дате? Да/Нет\n"):
+        direction = input("Отсортировать по возрастанию или по убыванию?\n").strip().lower()
+
+        while direction not in {"по возрастанию", "по убыванию"}:
+            print("Введите «по возрастанию» или «по убыванию».")
+            direction = input("Отсортировать по возрастанию или по убыванию?\n").strip().lower()
+
+        transactions = sort_by_date(
+            transactions,
+            descending=direction == "по убыванию",
+        )
+
+    if ask_yes_no("Выводить только рублевые транзакции? Да/Нет\n"):
+        transactions = filter_rub_transactions(transactions)
+
+    if ask_yes_no("Отфильтровать список транзакций по определенному слову в описании? Да/Нет\n"):
+        search = input("Введите слово для поиска: ").strip()
+        transactions = process_bank_search(transactions, search)
+
+    print("Распечатываю итоговый список транзакций...")
+
+    if not transactions:
+        print("Не найдено ни одной транзакции, подходящей под ваши " "условия фильтрации")
+        return
+
+    print(f"Всего банковских операций в выборке: {len(transactions)}")
+    print()
+
+    for transaction in transactions:
+        print_transaction(transaction)
 
 
 if __name__ == "__main__":
-    cleared_names = clear_names("names.txt")
-    # for i in cleared_names:
-    #     print(i)
-    filtered_name = filter_russian_names(cleared_names)
-    safe_to_file("russian_names.txt", "\n".join(filtered_name))
+    main()
 
-    filtered_name = filter_english_names(cleared_names)
-    safe_to_file("english_names.txt", "\n".join(filtered_name))
-
-
-def divider(x, y):
-    if y >0:
-        return x/y
-    return 0
-
-
-def reverse_strring(my_string):
-    return my_string[::-1]
-
-def calculate_logarithm(x,base):
-    return math.log(x, base)
-
-def calc_avg(my_list):
-    if len(my_list) == 0:
-        return 0
-    return sum(my_list)/len(my_list)
-
-assert calc_avg([1,2,3,4]) == 2.5
-
-assert calc_avg([]) == 0
-
-
-def finder(my_list, my_type):
-    counter = 0
-    for item in my_list:
-         if isinstance(item, my_type):
-             counter += 1
-    return counter
-
+    ##############
